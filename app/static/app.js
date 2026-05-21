@@ -40,61 +40,77 @@ function showError(msg) {
   el.classList.remove("hidden");
 }
 
+function renderRows(rows) {
+  return rows.map(([label, value]) =>
+    `<div class="info-row flex justify-between gap-3 py-1.5">
+      <span class="text-[11px] text-slate-500 shrink-0">${label}</span>
+      <span class="text-[11px] text-slate-300 font-mono text-right break-all" title="${value}">${value}</span>
+    </div>`
+  ).join("");
+}
+
 function renderResult(data) {
   document.getElementById("input-section").classList.add("hidden");
-  const resultSection = document.getElementById("result-section");
-  resultSection.classList.remove("hidden");
+  document.getElementById("header").classList.add("mb-2");
+  document.getElementById("result-section").classList.remove("hidden");
 
   const badge = document.getElementById("status-badge");
   if (data.is_expired) {
     badge.textContent = "Expired";
-    badge.className = "badge-expired px-3 py-1 rounded-full text-xs font-medium";
+    badge.className = "badge-expired px-2.5 py-0.5 rounded-full text-xs font-medium";
   } else if (data.days_remaining < 30) {
     badge.textContent = `Expires in ${data.days_remaining} days`;
-    badge.className = "badge-warning px-3 py-1 rounded-full text-xs font-medium";
+    badge.className = "badge-warning px-2.5 py-0.5 rounded-full text-xs font-medium";
   } else {
     badge.textContent = `Valid (${data.days_remaining} days)`;
-    badge.className = "badge-ok px-3 py-1 rounded-full text-xs font-medium";
+    badge.className = "badge-ok px-2.5 py-0.5 rounded-full text-xs font-medium";
   }
 
-  const rows = [
+  document.getElementById("col-subject").innerHTML = renderRows([
     ["Common Name", data.subject.commonName || "N/A"],
     ["Organization", data.subject.organizationName || "N/A"],
+    ["Country", data.subject.countryName || "N/A"],
+    ["Valid From", formatDate(data.not_before)],
+    ["Valid Until", formatDate(data.not_after)],
+  ]);
+
+  document.getElementById("col-issuer").innerHTML = renderRows([
     ["Issuer", data.issuer.commonName || data.issuer.organizationName || "N/A"],
     ["Issuer Org", data.issuer.organizationName || "N/A"],
     ["Serial Number", data.serial_number],
-    ["Valid From", formatDate(data.not_before)],
-    ["Valid Until", formatDate(data.not_after)],
-    ["Signature Algorithm", data.signature_algorithm],
-    ["Public Key", formatKey(data.public_key)],
     ["Version", data.version],
     ["Self-Signed", data.is_self_signed ? "Yes" : "No"],
-    ["SHA-256 Fingerprint", data.fingerprints.sha256],
-    ["SHA-1 Fingerprint", data.fingerprints.sha1],
-  ];
+  ]);
 
-  const details = document.getElementById("cert-details");
-  details.innerHTML = rows.map(([label, value]) =>
-    `<div class="info-row flex justify-between py-2.5">
-      <span class="text-xs text-slate-500">${label}</span>
-      <span class="text-xs text-slate-300 font-mono text-right max-w-[60%] break-all">${value}</span>
-    </div>`
-  ).join("");
+  document.getElementById("col-crypto").innerHTML = renderRows([
+    ["Signature Algorithm", data.signature_algorithm],
+    ["Public Key", formatKey(data.public_key)],
+    ["SHA-256", data.fingerprints.sha256],
+    ["SHA-1", data.fingerprints.sha1],
+  ]);
 
   const sanExt = data.extensions.find(e => e.san);
+  const sanSection = document.getElementById("san-section");
+  const bottomGrid = document.getElementById("bottom-grid");
+  const extensionsSection = document.getElementById("extensions-section");
+
   if (sanExt && sanExt.san.length > 0) {
-    const sanSection = document.getElementById("san-section");
     sanSection.classList.remove("hidden");
+    extensionsSection.classList.remove("col-span-2");
+    bottomGrid.className = "grid grid-cols-2 gap-4 mt-4 shrink-0";
     document.getElementById("san-list").innerHTML = sanExt.san.map(name =>
-      `<div class="text-xs font-mono text-slate-300 py-1">${name}</div>`
+      `<span class="text-[11px] font-mono text-slate-300">${name}</span>`
     ).join("");
+  } else {
+    sanSection.classList.add("hidden");
+    extensionsSection.classList.add("col-span-2");
+    bottomGrid.className = "grid grid-cols-1 gap-4 mt-4 shrink-0";
   }
 
-  const extList = document.getElementById("extensions-list");
-  extList.innerHTML = data.extensions.map(ext =>
-    `<div class="flex justify-between py-1.5">
-      <span class="text-xs text-slate-400">${ext.name}</span>
-      <span class="text-xs ${ext.critical ? 'text-yellow-400' : 'text-slate-600'}">${ext.critical ? 'Critical' : 'Non-critical'}</span>
+  document.getElementById("extensions-list").innerHTML = data.extensions.map(ext =>
+    `<div class="flex justify-between gap-2 py-0.5">
+      <span class="text-[11px] text-slate-400 truncate">${ext.name}</span>
+      <span class="text-[11px] shrink-0 ${ext.critical ? 'text-yellow-400' : 'text-slate-600'}">${ext.critical ? 'Critical' : 'Non-critical'}</span>
     </div>`
   ).join("");
 }
@@ -113,7 +129,9 @@ function formatKey(key) {
 function reset() {
   document.getElementById("input-section").classList.remove("hidden");
   document.getElementById("result-section").classList.add("hidden");
+  document.getElementById("header").classList.remove("mb-2");
   document.getElementById("san-section").classList.add("hidden");
+  document.getElementById("extensions-section").classList.remove("col-span-2");
   document.getElementById("pem-input").value = "";
   document.getElementById("error-msg").classList.add("hidden");
 }

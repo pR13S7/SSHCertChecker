@@ -23,51 +23,66 @@
     .animate-in { animation: fadeIn 0.3s ease-out; }
   </style>
 </head>
-<body class="min-h-screen text-white flex items-center justify-center p-4">
-  <div class="w-full max-w-2xl">
-    <div class="text-center mb-8">
-      <div class="flex items-center justify-center gap-3 mb-2">
-        <img src="/logo.svg" alt="" class="h-10 w-10 shrink-0" width="40" height="40">
-        <h1 class="text-2xl font-semibold tracking-tight">
+<body class="h-screen overflow-hidden text-white">
+  <div id="app" class="h-full flex flex-col px-8 py-5 max-w-[1800px] mx-auto w-full">
+    <header id="header" class="shrink-0 text-center mb-4">
+      <div class="flex items-center justify-center gap-3">
+        <img src="/logo.svg" alt="" class="h-9 w-9 shrink-0" width="36" height="36">
+        <h1 class="text-xl font-semibold tracking-tight">
           <span class="text-indigo-400">SSL</span> Certificate Checker
         </h1>
       </div>
-      <p class="text-slate-500 text-sm mt-1">Paste a PEM-encoded SSL/TLS certificate to inspect its details</p>
-    </div>
+      <p class="text-slate-500 text-xs mt-1">Paste a PEM-encoded SSL/TLS certificate to inspect its details</p>
+    </header>
 
-    <div id="input-section" class="card rounded-2xl p-6">
-      <textarea id="pem-input" class="input-area w-full h-48 rounded-xl px-4 py-3 text-sm font-mono text-slate-300 resize-none" placeholder="-----BEGIN CERTIFICATE-----
+    <div id="input-section" class="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full">
+      <div class="card rounded-2xl p-6">
+        <textarea id="pem-input" class="input-area w-full h-40 rounded-xl px-4 py-3 text-sm font-mono text-slate-300 resize-none" placeholder="-----BEGIN CERTIFICATE-----
 MIIExample...
 -----END CERTIFICATE-----"></textarea>
-      <button id="parse-btn" onclick="parseCert()" class="btn-primary w-full mt-4 py-2.5 rounded-xl text-sm font-medium transition-all">
-        Parse Certificate
-      </button>
-      <p id="error-msg" class="text-red-400 text-xs mt-3 hidden"></p>
+        <button id="parse-btn" onclick="parseCert()" class="btn-primary w-full mt-4 py-2.5 rounded-xl text-sm font-medium transition-all">
+          Parse Certificate
+        </button>
+        <p id="error-msg" class="text-red-400 text-xs mt-3 hidden"></p>
+      </div>
     </div>
 
-    <div id="result-section" class="hidden animate-in mt-6">
-      <div class="card rounded-2xl p-6 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-medium">Certificate Info</h2>
-          <span id="status-badge" class="px-3 py-1 rounded-full text-xs font-medium"></span>
+    <div id="result-section" class="hidden flex-1 flex flex-col min-h-0 animate-in">
+      <div class="flex items-center justify-between mb-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <h2 class="text-base font-medium">Certificate Info</h2>
+          <span id="status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium"></span>
         </div>
-
-        <div id="cert-details" class="space-y-0"></div>
+        <button onclick="reset()" class="border border-white/[0.1] hover:border-white/[0.2] hover:bg-white/[0.03] px-4 py-1.5 rounded-lg text-xs font-medium transition-all">
+          Check another certificate
+        </button>
       </div>
 
-      <div id="san-section" class="card rounded-2xl p-6 mt-4 hidden">
-        <h3 class="text-sm font-medium text-slate-400 mb-3">Subject Alternative Names</h3>
-        <div id="san-list" class="space-y-1"></div>
+      <div class="flex-1 grid grid-cols-3 gap-4 min-h-0">
+        <div class="card rounded-xl p-4 flex flex-col min-h-0">
+          <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2 shrink-0">Subject & Validity</h3>
+          <div id="col-subject" class="space-y-0 overflow-hidden"></div>
+        </div>
+        <div class="card rounded-xl p-4 flex flex-col min-h-0">
+          <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2 shrink-0">Issuer & Identity</h3>
+          <div id="col-issuer" class="space-y-0 overflow-hidden"></div>
+        </div>
+        <div class="card rounded-xl p-4 flex flex-col min-h-0">
+          <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2 shrink-0">Cryptography</h3>
+          <div id="col-crypto" class="space-y-0 overflow-hidden"></div>
+        </div>
       </div>
 
-      <div id="extensions-section" class="card rounded-2xl p-6 mt-4">
-        <h3 class="text-sm font-medium text-slate-400 mb-3">Extensions</h3>
-        <div id="extensions-list" class="space-y-1"></div>
+      <div id="bottom-grid" class="grid grid-cols-2 gap-4 mt-4 shrink-0">
+        <div id="san-section" class="card rounded-xl p-4 hidden">
+          <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2">Subject Alternative Names</h3>
+          <div id="san-list" class="flex flex-wrap gap-x-4 gap-y-1"></div>
+        </div>
+        <div id="extensions-section" class="card rounded-xl p-4">
+          <h3 class="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2">Extensions</h3>
+          <div id="extensions-list" class="grid grid-cols-2 gap-x-6 gap-y-1"></div>
+        </div>
       </div>
-
-      <button onclick="reset()" class="w-full mt-4 border border-white/[0.1] hover:border-white/[0.2] hover:bg-white/[0.03] py-2.5 rounded-xl text-sm font-medium transition-all">
-        Check another certificate
-      </button>
     </div>
   </div>
   <script src="/app.js"></script>
