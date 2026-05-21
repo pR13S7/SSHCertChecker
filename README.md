@@ -12,6 +12,8 @@ Web application that parses PEM-encoded X.509 certificates and displays their de
 - SHA-256 and SHA-1 fingerprints
 - Self-signed detection
 
+![SSL Cert Checker screenshot](imgs/screenshot.png)
+
 ## Run Locally
 
 ```bash
