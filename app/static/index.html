@@ -60,14 +60,9 @@ MIIExample...
     </div>
 
     <div id="result-section" class="hidden flex-1 flex flex-col animate-in">
-      <div class="flex items-center justify-between mb-3 shrink-0">
-        <div class="flex items-center gap-3">
-          <h2 class="text-base font-medium">Certificate Info</h2>
-          <span id="status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium"></span>
-        </div>
-        <button onclick="reset()" class="border border-white/[0.1] hover:border-white/[0.2] hover:bg-white/[0.03] px-4 py-1.5 rounded-lg text-xs font-medium transition-all">
-          Check another certificate
-        </button>
+      <div class="flex items-center gap-3 mb-3 shrink-0">
+        <h2 class="text-base font-medium">Certificate Info</h2>
+        <span id="status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium"></span>
       </div>
 
       <div class="results-grid">
@@ -95,6 +90,10 @@ MIIExample...
           <div id="extensions-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px;"></div>
         </div>
       </div>
+
+      <button onclick="reset()" class="btn-primary w-full mt-6 py-4 rounded-xl text-base font-medium transition-all shrink-0">
+        Check Another Certificate
+      </button>
     </div>
   </div>
   <script src="/app.js?v=3"></script>
